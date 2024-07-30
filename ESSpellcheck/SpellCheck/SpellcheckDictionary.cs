@@ -11,7 +11,7 @@ namespace ESSpellcheck.SpellCheck
 
         public SpellcheckDictionary(IEnumerable<string> words) : base(words)
         {
-            
+
         }
 
         /// <summary>
@@ -23,28 +23,28 @@ namespace ESSpellcheck.SpellCheck
         /// <exception cref="ESSpellcheck.WordNotFoundException">Word not found in dictionary</exception>
         public string GetClosestWord(string word)
         {
-            if(string.IsNullOrEmpty(word))
+            if (string.IsNullOrEmpty(word))
                 throw new ArgumentNullException("Can't get closest suggestion on empty word");
 
             if (Contains(word)) // word exists already
                 return word;
 
-            HashSet<string> candidates = new HashSet<string>();
-            
-            OneLetterOffWords(word, candidates); 
+            HashSet<string> candidates = [];
+
+            OneLetterOffWords(word, candidates);
             OneLetterRemoval(word, candidates);
             SingleLetterAddition(word, candidates);
 
             if (candidates.Count == 0)
                 throw new WordNotFoundException("Word not found in dictionary");
 
-            
+
             if (candidates.Count == 1)
                 return candidates.First();
 
             Random r = new Random();
             return candidates.ElementAt(r.Next(candidates.Count));
-            
+
         }
 
         /// <summary>
@@ -121,11 +121,11 @@ namespace ESSpellcheck.SpellCheck
 
                     if (Contains(candidate))
                         candidates.Add(candidate);
-                    
+
                 }
             }
         }
-        
+
     }
-    
+
 }
