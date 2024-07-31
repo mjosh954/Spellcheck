@@ -1,20 +1,18 @@
 ﻿using ESSpellcheck.SpellCheck;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ESSpellcheck;
 
 internal class Program
 {
-    private static ISpellcheck spellchecker;
-
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         try
         {
-            BuildSpellCheckDictionary();
-            GetInputRun();
+            var spellchecker = await SpellCheckFactory.GetDictionary("english.dict");
+            GetInputRun(spellchecker);
         }
         catch (IOException ex)
         {
@@ -30,7 +28,7 @@ internal class Program
     /// <summary>
     /// Main run. Gets the input from the console and sends it to get closes word
     /// </summary>
-    private static void GetInputRun()
+    private static void GetInputRun(ISpellcheck spellchecker)
     {
         while (true)
         {
@@ -41,11 +39,11 @@ internal class Program
                 string suggestion = spellchecker.GetClosestWord(word);
                 Console.WriteLine(suggestion);
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Must input a word");
             }
-            catch (WordNotFoundException ex)
+            catch (WordNotFoundException)
             {
                 Console.WriteLine("NO SUGGESTION");
             }
@@ -54,26 +52,5 @@ internal class Program
                 Console.WriteLine(ex.Message);
             }
         }
-    }
-
-    /// <summary>
-    /// Builds the spell check dictionary.
-    /// </summary>
-    private static void BuildSpellCheckDictionary()
-    {
-        var words = new List<string>();
-        using (StreamReader reader = File.OpenText(@"english.dict"))
-            while (!reader.EndOfStream)
-            {
-                string line = reader.ReadLine();
-                if (null == line)
-                    continue;
-                words.Add(line);
-            }
-
-        if (words.Count == 0)
-            throw new Exception("Dictionary file empty");
-
-        spellchecker = new SpellcheckDictionary(words);
     }
 }
